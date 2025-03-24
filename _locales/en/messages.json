@@ -1,0 +1,11 @@
+{
+    "extension_name": {
+      "message": "Video Speed Controller & Ad Skipper",
+      "description": "The name of the extension"
+    },
+    "extension_description": {
+      "message": "Control video playback speed and skip ads automatically on YouTube and other video platforms.",
+      "description": "The description of the extension"
+    }
+  }
+  

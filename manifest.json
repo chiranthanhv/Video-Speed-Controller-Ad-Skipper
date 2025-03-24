@@ -1,0 +1,87 @@
+{
+  "manifest_version": 3,
+  "name": "Video Speed Controller & Ad Skipper",
+  "version": "1.2",
+  "description": "Control video speed, skip ads, and enhance your streaming experience.",
+  "default_locale": "en",
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.netflix.com/*",
+    "*://*.udemy.com/*",
+    "*://*.vimeo.com/*",
+    "*://*.dailymotion.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.netflix.com/*",
+        "*://*.udemy.com/*",
+        "*://*.vimeo.com/*",
+        "*://*.dailymotion.com/*"
+      ],
+      "js": ["src/content_scripts/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "src/assets/icons/icon16.png",
+      "48": "src/assets/icons/icon48.png",
+      "128": "src/assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "src/assets/icons/icon16.png",
+    "48": "src/assets/icons/icon48.png",
+    "128": "src/assets/icons/icon128.png"
+  },
+  "options_page": "src/options/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["src/assets/icons/*.png"],
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.netflix.com/*",
+        "*://*.udemy.com/*",
+        "*://*.vimeo.com/*",
+        "*://*.dailymotion.com/*"
+      ]
+    }
+  ],
+  "externally_connectable": {
+    "matches": [
+      "*://*.youtube.com/*",
+      "*://*.netflix.com/*",
+      "*://*.udemy.com/*",
+      "*://*.vimeo.com/*",
+      "*://*.dailymotion.com/*"
+    ]
+  },
+  "commands": {
+    "increase_speed": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Up"
+      },
+      "description": "Increase video playback speed"
+    },
+    "decrease_speed": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Down"
+      },
+      "description": "Decrease video playback speed"
+    },
+    "reset_speed": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R"
+      },
+      "description": "Reset video playback speed"
+    }
+  }
+}
