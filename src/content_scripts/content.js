@@ -2,8 +2,9 @@
 function adjustSpeed(speedChange) {
     let video = document.querySelector("video");
     if (video) {
-        video.playbackRate = Math.max(0.25, video.playbackRate + speedChange); // Prevent negative speed
-        showVideoOverlay(`Speed: ${video.playbackRate.toFixed(2)}x`);
+        let newSpeed = Math.min(16, Math.max(0.25, video.playbackRate + speedChange)); // Restrict range
+        video.playbackRate = newSpeed;
+        showVideoOverlay(`Speed: ${newSpeed.toFixed(2)}x`);
     }
 }
 
@@ -20,6 +21,15 @@ function resetSpeed() {
 function showVideoOverlay(text) {
     let video = document.querySelector("video");
     if (!video) return;
+
+    // Find the closest positioned parent (video container)
+    let container = video.closest("div") || video.parentElement;
+    if (!container) return;
+
+    // Ensure container is positioned properly
+    if (getComputedStyle(container).position === "static") {
+        container.style.position = "relative";
+    }
 
     // Check if overlay exists, else create it
     let overlay = document.getElementById("video-overlay-message");
@@ -39,9 +49,10 @@ function showVideoOverlay(text) {
         overlay.style.opacity = "0";
         overlay.style.transition = "opacity 0.3s ease-in-out";
         overlay.style.pointerEvents = "none";
+        overlay.style.zIndex = "9999"; // Ensure it's above other elements
 
         // Append to video container
-        video.parentElement.appendChild(overlay);
+        container.appendChild(overlay);
     }
 
     // Update text and fade in
