@@ -13,6 +13,10 @@
     "declarativeNetRequestWithHostAccess",
     "declarativeNetRequestFeedback"
   ],
+  "optional_permissions": [
+    "downloads",
+    "clipboardWrite"
+  ],
   "host_permissions": [
     "*://*.youtube.com/*",
     "*://*.netflix.com/*",
@@ -53,7 +57,11 @@
   "options_page": "src/options/options.html",
   "web_accessible_resources": [
     {
-      "resources": ["src/assets/icons/*.png"],
+      "resources": [
+        "src/assets/icons/*.png",
+        "src/assets/fonts/*",
+        "src/assets/css/*"
+      ],
       "matches": [
         "*://*.youtube.com/*",
         "*://*.netflix.com/*",

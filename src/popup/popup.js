@@ -6,81 +6,69 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetSpeedBtn = document.getElementById("resetSpeed");
     const openSettingsBtn = document.getElementById("openSettings");
     const backToMainBtn = document.getElementById("backToMain");
+    const autoSkipCheckbox = document.getElementById("autoSkip");
 
     function updateSpeedDisplay(speed) {
         speedDisplay.textContent = `Speed: ${speed.toFixed(2)}x`;
         speedSlider.value = speed;
     }
 
-    function adjustSpeed(change) {
+    function executeScriptOnActiveTab(func, args = []) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length === 0) return;
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
-                function: (speedChange) => {
-                    let video = document.querySelector("video");
-                    if (video) {
-                        video.playbackRate = Math.max(0.25, Math.min(16, video.playbackRate + speedChange));
-                        let speed = video.playbackRate;
-                        chrome.storage.sync.set({ videoSpeed: speed });
-
-                        let overlay = document.getElementById("speedOverlay");
-                        if (!overlay) {
-                            overlay = document.createElement("div");
-                            overlay.id = "speedOverlay";
-                            overlay.style.position = "fixed";
-                            overlay.style.bottom = "10%";
-                            overlay.style.right = "10%";
-                            overlay.style.background = "rgba(0, 0, 0, 0.7)";
-                            overlay.style.color = "#fff";
-                            overlay.style.padding = "10px";
-                            overlay.style.borderRadius = "5px";
-                            overlay.style.fontSize = "18px";
-                            overlay.style.zIndex = "9999";
-                            document.body.appendChild(overlay);
-                        }
-                        overlay.textContent = `Speed: ${speed.toFixed(2)}x`;
-                        setTimeout(() => overlay.remove(), 1000);
-
-                        return speed;
-                    }
-                    return null;
-                },
-                args: [change]
+                function: func,
+                args: args
             });
         });
     }
 
+    function adjustSpeed(change) {
+        executeScriptOnActiveTab((speedChange) => {
+            let video = document.querySelector("video");
+            if (video) {
+                video.playbackRate = Math.max(0.25, Math.min(16, video.playbackRate + speedChange));
+                let speed = video.playbackRate;
+                chrome.storage.sync.set({ videoSpeed: speed });
+                showSpeedOverlay(speed);
+                return speed;
+            }
+            return null;
+        }, [change]);
+    }
+
     function resetSpeed() {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                function: () => {
-                    let video = document.querySelector("video");
-                    if (video) {
-                        video.playbackRate = 1.0;
-                        chrome.storage.sync.set({ videoSpeed: 1.0 });
-
-                        let overlay = document.createElement("div");
-                        overlay.id = "speedOverlay";
-                        overlay.style.position = "fixed";
-                        overlay.style.bottom = "10%";
-                        overlay.style.right = "10%";
-                        overlay.style.background = "rgba(0, 0, 0, 0.7)";
-                        overlay.style.color = "#fff";
-                        overlay.style.padding = "10px";
-                        overlay.style.borderRadius = "5px";
-                        overlay.style.fontSize = "18px";
-                        overlay.style.zIndex = "9999";
-                        overlay.textContent = "Speed: 1.00x";
-                        document.body.appendChild(overlay);
-                        setTimeout(() => overlay.remove(), 1000);
-
-                        return 1.0;
-                    }
-                    return null;
-                }
-            });
+        executeScriptOnActiveTab(() => {
+            let video = document.querySelector("video");
+            if (video) {
+                video.playbackRate = 1.0;
+                chrome.storage.sync.set({ videoSpeed: 1.0 });
+                showSpeedOverlay(1.0);
+                return 1.0;
+            }
+            return null;
         });
+    }
+
+    function showSpeedOverlay(speed) {
+        let overlay = document.getElementById("speedOverlay");
+        if (!overlay) {
+            overlay = document.createElement("div");
+            overlay.id = "speedOverlay";
+            overlay.style.position = "fixed";
+            overlay.style.bottom = "10%";
+            overlay.style.right = "10%";
+            overlay.style.background = "rgba(0, 0, 0, 0.7)";
+            overlay.style.color = "#fff";
+            overlay.style.padding = "10px";
+            overlay.style.borderRadius = "5px";
+            overlay.style.fontSize = "18px";
+            overlay.style.zIndex = "9999";
+            document.body.appendChild(overlay);
+        }
+        overlay.textContent = `Speed: ${speed.toFixed(2)}x`;
+        setTimeout(() => overlay.remove(), 1000);
     }
 
     // Button event listeners
@@ -91,19 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Slider event listener
     speedSlider.addEventListener("input", (event) => {
         let newSpeed = parseFloat(event.target.value);
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                function: (speed) => {
-                    let video = document.querySelector("video");
-                    if (video) {
-                        video.playbackRate = speed;
-                        chrome.storage.sync.set({ videoSpeed: speed });
-                    }
-                },
-                args: [newSpeed]
-            });
-        });
+        executeScriptOnActiveTab((speed) => {
+            let video = document.querySelector("video");
+            if (video) {
+                video.playbackRate = speed;
+                chrome.storage.sync.set({ videoSpeed: speed });
+            }
+        }, [newSpeed]);
         updateSpeedDisplay(newSpeed);
     });
 
@@ -135,10 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load saved settings
     chrome.storage.sync.get(["autoSkip"], (result) => {
-        document.getElementById("autoSkip").checked = result.autoSkip || false;
+        autoSkipCheckbox.checked = result.autoSkip || false;
     });
 
-    document.getElementById("autoSkip").addEventListener("change", function () {
+    autoSkipCheckbox.addEventListener("change", function () {
         chrome.storage.sync.set({ autoSkip: this.checked });
     });
 });

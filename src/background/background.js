@@ -53,3 +53,25 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
     }
 });
+
+// Auto-skip ads when detected
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === "complete") {
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            function: () => {
+                const checkAd = () => {
+                    let adElements = document.querySelectorAll(".ad-showing, .ytp-ad-module");
+                    if (adElements.length > 0) {
+                        let skipButton = document.querySelector(".ytp-ad-skip-button, .ytp-ad-skip-button-modern");
+                        if (skipButton) {
+                            skipButton.click();
+                            console.log("Ad skipped!");
+                        }
+                    }
+                };
+                setInterval(checkAd, 2000);
+            }
+        });
+    }
+});
