@@ -90,6 +90,12 @@
         "default": "Ctrl+Shift+R"
       },
       "description": "Reset video playback speed"
+    },
+    "open_settings": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Open extension settings"
     }
   },
   "declarative_net_request": {

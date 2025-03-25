@@ -116,3 +116,26 @@ document.addEventListener("keydown", (event) => {
 
 // Auto-skip ads every second
 setInterval(skipAds, 1000);
+
+// Floating UI Controller
+document.addEventListener("DOMContentLoaded", () => {
+    let controller = document.createElement("div");
+    controller.id = "floating-video-controller";
+    controller.style.position = "fixed";
+    controller.style.bottom = "20px";
+    controller.style.right = "20px";
+    controller.style.background = "rgba(0, 0, 0, 0.8)";
+    controller.style.color = "white";
+    controller.style.padding = "10px";
+    controller.style.borderRadius = "8px";
+    controller.style.zIndex = "10000";
+    controller.style.cursor = "pointer";
+    controller.style.fontSize = "14px";
+    controller.innerHTML = "<button id='increaseSpeed'>➕ Speed</button> <button id='decreaseSpeed'>➖ Speed</button> <button id='resetSpeed'>🔄 Reset</button> <button id='skipAd'>⏩ Skip Ad</button>";
+    document.body.appendChild(controller);
+
+    document.getElementById("increaseSpeed").addEventListener("click", () => adjustSpeed(0.25));
+    document.getElementById("decreaseSpeed").addEventListener("click", () => adjustSpeed(-0.25));
+    document.getElementById("resetSpeed").addEventListener("click", resetSpeed);
+    document.getElementById("skipAd").addEventListener("click", skipAds);
+});
