@@ -103,7 +103,7 @@ document.addEventListener("keydown", (event) => {
                 adjustSpeed(-0.25); // Decrease speed
                 break;
             case "r":
-                event.preventDefault();
+                // event.preventDefault();
                 resetSpeed(); // Reset speed
                 break;
             case "a":
