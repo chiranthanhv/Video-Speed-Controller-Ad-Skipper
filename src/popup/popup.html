@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div class="popup-container">
+    <div class="popup-container" id="mainPopup">
         <h2>Video Speed Controller</h2>
         <p id="speedDisplay">Speed: 1.00x</p> <!-- Display current speed -->
 
@@ -21,6 +21,16 @@
         <hr>
         <button id="openSettings" title="Open Settings">⚙️ Settings</button>
     </div>
+
+    <!-- Settings Panel -->
+    <div class="popup-container" id="settingsPopup" style="display: none;">
+        <h2>Settings</h2>
+        <label>
+            <input type="checkbox" id="autoSkip"> Enable Auto-Skip Ads
+        </label>
+        <button id="backToMain">⬅ Back</button>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 </html>

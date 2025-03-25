@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const increaseSpeedBtn = document.getElementById("increaseSpeed");
     const decreaseSpeedBtn = document.getElementById("decreaseSpeed");
     const resetSpeedBtn = document.getElementById("resetSpeed");
+    const openSettingsBtn = document.getElementById("openSettings");
+    const backToMainBtn = document.getElementById("backToMain");
 
     function updateSpeedDisplay(speed) {
         speedDisplay.textContent = `Speed: ${speed.toFixed(2)}x`;
@@ -119,8 +121,24 @@ document.addEventListener("DOMContentLoaded", () => {
             if (event.key === "0") resetSpeed(); // Alt + 0 to reset speed
         }
     });
-});
 
-document.getElementById("openSettings").addEventListener("click", function () {
-    chrome.runtime.openOptionsPage();
+    // Handle settings UI
+    openSettingsBtn.addEventListener("click", function () {
+        document.getElementById("mainPopup").style.display = "none";
+        document.getElementById("settingsPopup").style.display = "block";
+    });
+
+    backToMainBtn.addEventListener("click", function () {
+        document.getElementById("settingsPopup").style.display = "none";
+        document.getElementById("mainPopup").style.display = "block";
+    });
+
+    // Load saved settings
+    chrome.storage.sync.get(["autoSkip"], (result) => {
+        document.getElementById("autoSkip").checked = result.autoSkip || false;
+    });
+
+    document.getElementById("autoSkip").addEventListener("change", function () {
+        chrome.storage.sync.set({ autoSkip: this.checked });
+    });
 });
