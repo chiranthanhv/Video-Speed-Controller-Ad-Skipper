@@ -1,10 +1,18 @@
 {
   "manifest_version": 3,
   "name": "Video Speed Controller & Ad Skipper",
-  "version": "1.2",
+  "version": "1.0.0",
   "description": "Control video speed, skip ads, and enhance your streaming experience.",
   "default_locale": "en",
-  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback"
+  ],
   "host_permissions": [
     "*://*.youtube.com/*",
     "*://*.netflix.com/*",
@@ -83,5 +91,14 @@
       },
       "description": "Reset video playback speed"
     }
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "block_ads",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   }
 }

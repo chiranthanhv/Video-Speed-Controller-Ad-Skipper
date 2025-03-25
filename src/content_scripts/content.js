@@ -17,29 +17,21 @@ function resetSpeed() {
     }
 }
 
-// Function to create and show YouTube-like overlay message
+// Function to create and show YouTube-like overlay message in the center of the video
 function showVideoOverlay(text) {
     let video = document.querySelector("video");
     if (!video) return;
 
-    // Find the closest positioned parent (video container)
-    let container = video.closest("div") || video.parentElement;
-    if (!container) return;
+    // Get video position and size
+    let rect = video.getBoundingClientRect();
 
-    // Ensure container is positioned properly
-    if (getComputedStyle(container).position === "static") {
-        container.style.position = "relative";
-    }
-
-    // Check if overlay exists, else create it
     let overlay = document.getElementById("video-overlay-message");
     if (!overlay) {
         overlay = document.createElement("div");
         overlay.id = "video-overlay-message";
-        overlay.style.position = "absolute";
-        overlay.style.top = "50%";
-        overlay.style.left = "50%";
-        overlay.style.transform = "translate(-50%, -50%)";
+        document.body.appendChild(overlay);
+
+        overlay.style.position = "fixed"; // Fixed to viewport
         overlay.style.background = "rgba(0, 0, 0, 0.7)";
         overlay.style.color = "#fff";
         overlay.style.fontSize = "24px";
@@ -49,13 +41,15 @@ function showVideoOverlay(text) {
         overlay.style.opacity = "0";
         overlay.style.transition = "opacity 0.3s ease-in-out";
         overlay.style.pointerEvents = "none";
-        overlay.style.zIndex = "9999"; // Ensure it's above other elements
-
-        // Append to video container
-        container.appendChild(overlay);
+        overlay.style.zIndex = "9999"; // Ensure it's above all elements
     }
 
-    // Update text and fade in
+    // Position overlay at the center of the video
+    overlay.style.left = `${rect.left + rect.width / 2}px`;
+    overlay.style.top = `${rect.top + rect.height / 2}px`;
+    overlay.style.transform = "translate(-50%, -50%)";
+
+    // Set text and fade in
     overlay.textContent = text;
     overlay.style.opacity = "1";
 
@@ -64,6 +58,36 @@ function showVideoOverlay(text) {
     window.overlayTimeout = setTimeout(() => {
         overlay.style.opacity = "0";
     }, 1000);
+}
+
+// Function to skip YouTube ads
+function skipAds() {
+    // Find and click "Skip Ad" button
+    let skipButton = document.querySelector(".ytp-ad-skip-button, .ytp-ad-skip-button-modern");
+    if (skipButton) {
+        skipButton.click();
+        console.log("Ad skipped!");
+        showVideoOverlay("Ad Skipped");
+        return;
+    }
+
+    // Close ad overlays
+    let closeOverlay = document.querySelector(".ytp-ad-overlay-close-button");
+    if (closeOverlay) {
+        closeOverlay.click();
+        console.log("Overlay ad closed!");
+        showVideoOverlay("Overlay Ad Closed");
+        return;
+    }
+
+    // Mute video if unskippable ad
+    let adPlaying = document.querySelector(".ad-showing");
+    let video = document.querySelector("video");
+    if (adPlaying && video) {
+        video.muted = true;
+        console.log("Unskippable ad detected, muted.");
+        showVideoOverlay("Unskippable Ad Muted");
+    }
 }
 
 // Keyboard shortcuts
@@ -82,15 +106,13 @@ document.addEventListener("keydown", (event) => {
                 event.preventDefault();
                 resetSpeed(); // Reset speed
                 break;
+            case "a":
+                event.preventDefault();
+                skipAds(); // Manually skip ads
+                break;
         }
     }
 }, { passive: false });
 
-// Skip ads on YouTube
-setInterval(() => {
-    let skipBtn = document.querySelector(".ytp-ad-skip-button, .ytp-ad-overlay-close-button");
-    if (skipBtn) {
-        skipBtn.click();
-        console.log("Ad skipped!");
-    }
-}, 1000);
+// Auto-skip ads every second
+setInterval(skipAds, 1000);
